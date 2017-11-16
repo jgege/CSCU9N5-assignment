@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+        <title>LogicGateWizard</title>
+
+        <!-- CSS  -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="vendor/materialize/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <style>
+            .one-screen-height {
+                height: 80vh;
+            }
+            .videoWrapper {
+                    position: relative;
+                    padding-bottom: 56.25%; /* 16:9 */
+                    padding-top: 25px;
+                    height: 0;
+            }
+            .videoWrapper iframe {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+            }
+            .modal-close-btn {
+                position:absolute;
+                top:0;
+                right:0;
+            }
+        </style>
+    </head>
+    <body>
+
+        <nav class="orange accent-4" role="navigation">
+            <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">LogicGateWizard</a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="#">Play</a></li>
+                    <li><a href="#">Gate types</a></li>
+                    <li><a href="#">Learning materials</a></li>
+                    <li><a href="#">Walkthroughs</a></li>
+                </ul>
+
+                <ul id="nav-mobile" class="side-nav">
+                    <li><a href="#">Play</a></li>
+                    <li><a href="#">Gate types</a></li>
+                    <li><a href="#">Learning materials</a></li>
+                    <li><a href="#">Walkthroughs</a></li>
+                </ul>
+                <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+            </div>
+        </nav>
+
+        <div class="section no-pad-bot one-screen-height yellow lighten-3" id="index-banner">
+            <div class="container">
+                <h1 class="header center orange-text">Logic gates</h1>
+                <div class="row center">
+                    <h5 class="header col s12 light">A game to help you learn more about logic gates</h5>
+                </div>
+                <div class="row center">
+                    <a class="waves-effect waves-light btn-large orange modal-trigger" href="#modal1">Play</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="red accent-4">
+            <div class="container">
+                <div class="section">
+                    <h2 class="header center white-text">Game elements</h2>
+                    <div class="row">
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/and.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">AND gate<i class="material-icons right">more_vert</i></span>
+                                    <p>AND gates have two inputs. The output of an AND gate is on only if both inputs are on. If at least one of the inputs are off, the output will be off.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">AND gate<i class="material-icons right">close</i></span>
+                                    <p>AND gates have two inputs. The output of an AND gate is on only if both inputs are on. If at least one of the inputs are off, the output will be off.</p>
+                                    <p>Truth table for AND gate</p>
+                                    <table class="striped centered responsive-table">
+                                        <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>1</td>
+                                                <td>1</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/or.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">OR gate<i class="material-icons right">more_vert</i></span>
+                                    <p>OR gates have two inputs. The output of an OR gate will be on if at least one of the inputs are on. If both inputs are off, the output will be off.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">OR gate<i class="material-icons right">close</i></span>
+                                    <p>OR gates have two inputs. The output of an OR gate will be on if at least one of the inputs are on. If both inputs are off, the output will be off.</p>                            
+                                    <p>Truth table for OR gate</p>
+                                    <table class="striped centered responsive-table">
+                                        <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>1</td>
+                                                <td>1</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/not.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">NOT gate<i class="material-icons right">more_vert</i></span>
+                                    <p>The NOT logic gate has only one input. If the input is On then the output will be Off. In other words, the NOT logic gate changes the signal from On to Off or from Off to On. It is sometimes called an inverter.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">NOT gate<i class="material-icons right">close</i></span>
+                                    <p>The NOT logic gate has only one input. If the input is On then the output will be Off. In other words, the NOT logic gate changes the signal from On to Off or from Off to On. It is sometimes called an inverter.</p>
+                                    <p>Truth table for NOT gate</p>
+                                    <table class="striped centered responsive-table">
+                                        <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/nand.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">NAND gate<i class="material-icons right">more_vert</i></span>
+                                    <p>Given two inputs, A and B, A NAND B will be true if at most one of A and B is true. In other words, A NAND B is false if both A and B are true, and true otherwise.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">NAND gate<i class="material-icons right">close</i></span>
+                                    <p>Given two inputs, A and B, A NAND B will be true if at most one of A and B is true. In other words, A NAND B is false if both A and B are true, and true otherwise.</p>
+                                    <p>Truth table for NAND gate</p>
+                                    <table class="striped centered responsive-table">
+                                        <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/nor.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">NOR gate<i class="material-icons right">more_vert</i></span>
+                                    <p>Outputs 1 when both of its inputs are 0.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">NOR gate<i class="material-icons right">close</i></span>
+                                    <p>Outputs 1 when both of its inputs are 0.</p>
+                                    <p>Truth table for NOR gate</p>
+                                    <table class="striped centered responsive-table">
+                                    <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image waves-effect waves-block waves-light">
+                                    <img class="activator" src="images/gates/xor.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title activator grey-text text-darken-4">XOR gate<i class="material-icons right">more_vert</i></span>
+                                    <p>The XOR gate is a logic gate that outputs 1 when exactly one of its inputs is 1.</p>
+                                </div>
+                                <div class="card-reveal">
+                                    <span class="card-title grey-text text-darken-4">XOR gate<i class="material-icons right">close</i></span>
+                                    <p>The XOR gate is a logic gate that outputs 1 when exactly one of its inputs is 1.</p>
+                                    <p>Truth table for XOR gate</p>
+                                    <table class="striped centered responsive-table">
+                                        <thead>
+                                            <tr>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Output</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>0</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>1</td>
+                                                <td>1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image">
+                                    <img src="images/gates/source.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title grey-text text-darken-4">Input</span>
+                                    <p>Input</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col l4 m6">
+                            <div class="card medium">
+                                <div class="card-image">
+                                    <img src="images/gates/endpoint.png">
+                                </div>
+                                <div class="card-content">
+                                    <span class="card-title grey-text text-darken-4">Output</span>
+                                    <p>Output</p>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="blue darken-3">
+            <div class="container">
+                <div class="section">
+                    <h2 class="header center white-text">Learning material</h2>
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card horizontal">
+                                <div class="card-image">
+                                    <img src="images/learning_material/computerphile_logic_gates.jpg">
+                                </div>
+                                <div class="card-stacked">
+                                    <div class="card-content">
+                                        <p>Basic logic gates explained and all the different ways they can be drawn and represented. Professor Brailsford takes us through the AND, OR & NOT logical operations.</p>
+                                        <span class="activator">Watch the video</span>
+                                    </div>
+                                    <div class="card-action">
+                                        <a class="modal-trigger" href="#modal-lm-1">Watch the video</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12">
+                            <div class="card horizontal">
+                                <div class="card-image">
+                                    <img src="images/learning_material/computerphile_xor.jpg">
+                                </div>
+                                <div class="card-stacked">
+                                    <div class="card-content">
+                                        <p>XOR, an essential logic operation, explained by Professor Brailsford. Continues our series on logic gates/operations.</p>
+                                    </div>
+                                    <div class="card-action">
+                                        <a class="modal-trigger" href="#modal-lm-2">Watch the video</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer blue">
+            <div class="footer-copyright">
+                <div class="container">
+                    Created by Student id: 2423955
+                </div>
+            </div>
+        </footer>
+
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <p>Hello World</p>
+                <button class="modal-close btn-flat modal-close-btn">X</button>
+            </div>
+        </div>
+
+        <div id="modal-lm-1" class="modal">
+            <div class="modal-content">
+                <div class="videoWrapper">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/UvI-AMAtrvE" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <button class="modal-close btn-flat modal-close-btn">X</button>
+            </div>
+        </div>
+        <div id="modal-lm-2" class="modal">
+            <div class="modal-content">
+                <div class="videoWrapper">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/VPw9vPN-3ac" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <button class="modal-close btn-flat modal-close-btn">X</button>
+            </div>
+        </div>
+
+
+        <!--  Scripts-->
+        <script src="vendor/jquery/jquery-2.1.1.min.js"></script>
+        <script src="vendor/materialize/js/materialize.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('.modal').modal({dismissible: false});
+            });
+        </script>
+    </body>
+</html>
