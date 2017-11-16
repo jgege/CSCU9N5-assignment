@@ -1,6 +1,9 @@
 var visGate = visGate || {};
 (function(module) {
     var canvasId = '';
+    var slotId = '';
+    var currentLevel = [];
+    var currentLevelTruthTable = [];
     var gameElementImages = {};
     var numberOfGameElementSprite = 0;
     var numberOfGameElementSpriteLoaded = 0;
@@ -15,7 +18,7 @@ var visGate = visGate || {};
             dragView: false
         },
         manipulation: {
-            enabled: true,
+            enabled: false,
             initiallyActive: true,
             deleteNode: false,
             addNode: false,
@@ -47,6 +50,7 @@ var visGate = visGate || {};
                 } else {
                     console.log("Can't connect a node to itself.");
                 }
+                network.addEdgeMode();
             },
             deleteEdge: function(data, callback) {
                 var filteredEdges = [];
@@ -61,7 +65,9 @@ var visGate = visGate || {};
                 if (data['edges'].length < 1) {
                     console.log("You can't delete that edge.");
                 }
+                resetNodeGameData();
                 callback(data);
+                network.addEdgeMode();
             }
         },
         edges: {
@@ -86,7 +92,7 @@ var visGate = visGate || {};
     function checkResult()
     {
         var allSourceNodes = nodes.get().filter(function (node) {
-            return (node.gateNodeType === 'output' && node.signal === true);
+            return (node.gateNodeType === 'output' && node.activeSignal === true);
         });
 
         checkStepForward(allSourceNodes, 0);
@@ -247,9 +253,9 @@ var visGate = visGate || {};
                     x: element.x, 
                     y: element.y,
                     color: ((element.type === 'source')? "red" : "yellow"),
-                    signal: (element.type === 'source') ? true : false,
+                    signal: element.signal, //(element.type === 'source') ? element.signal : false,
                     activeSignal: (element.type === 'source') ? true : false,
-                    label: (element.type === 'source') ? "1" : "",
+                    label: (element.type === 'source') ? ((element.signal === true) ? "1" : "0") : "",
                     gameElementId: element.id
                 }
             ],
@@ -261,6 +267,14 @@ var visGate = visGate || {};
     function createNodesAndEdgesFromGateElement(element, nodeId) {
         var nodes = [];
         var edges = [];
+        
+        if (element.subtype === 'empty') {
+            return {
+                nodes: nodes,
+                edges: edges
+            }
+        }
+        
         if (element.subtype !== 'not') { // only the "NOT gate" has 1 input and 1 output
             nodes.push({
                 id: nodeId, 
@@ -392,7 +406,38 @@ var visGate = visGate || {};
         return {"nodes": nodes, "edges": edges};
     }
 
-    function loadLevel(gameElements) {
+    function loadLevel(gameElements, truthTable) {
+        currentLevel = gameElements;
+        currentLevelTruthTable = truthTable;
+        initLevel(gameElements);
+    }
+    
+    function resetLevel() {
+        initLevel(currentLevel);
+    }
+    
+    function resetNodeGameData() {
+        var localNodes = nodes.get();
+        var updatedNodes = [];
+        var nodeIdList = [];
+        for(var i=0; i<localNodes.length; i++) {
+            var element = localNodes[i];
+            nodeIdList.push(element.id);
+            if (element.gateNodeEndpoint === true && element.gateNodeType === 'output') {
+                element.activeSignal = true;
+            } else {
+                element.activeSignal = false;
+                element.label = '';                
+            }
+            updatedNodes.push(element);
+            
+        }
+        nodes.update(updatedNodes);
+        network.selectNodes(nodeIdList, false); // hack to redraw node labels
+        network.unselectAll();
+    }
+
+    function initLevel(gameElements) {
         var nodesAndEdges = createNodesAndEdgesFromGameElements(gameElements);
         nodes = new vis.DataSet(nodesAndEdges['nodes']);
         edges = new vis.DataSet(nodesAndEdges['edges']);
@@ -404,8 +449,9 @@ var visGate = visGate || {};
             edges: edges
         };
         
-        console.log("Network is being initialised.");
+        //console.log("Network is being initialised.");
         network = new vis.Network(container, data, options);
+        module.network = network;
 
         network.on("afterDrawing", function (ctx) {
             var i = 0;
@@ -414,15 +460,47 @@ var visGate = visGate || {};
                 element = gameElements[i];
 
                 if (element.type === 'gate') {
-                    var elementImage = gameElementImages[element.subtype];
-                    var scaleBy = 200;
-                    var oHeight = elementImage.height;
-                    var oWidth = elementImage.width;
-                    var imageRatio = oHeight / oWidth;
-                    ctx.drawImage(elementImage, element.x - oWidth, element.y - oHeight, scaleBy, scaleBy * imageRatio);
+                    if (element.subtype === 'empty') {
+                        var originalStroke = ctx.strokeStyle;
+                        var originalFill = ctx.fillStyle;
+                        var width = 100;
+                        var height = 100;
+                        var x = element.x - Math.floor(width/2);
+                        var y = element.y - Math.floor(height/2);
+                        ctx.strokeStyle = "black";
+                        ctx.fillStyle = "black";
+                        ctx.strokeRect(x, y, width, height);
+                        ctx.textAlign = "center";
+                        ctx.textBaseline="middle"; 
+                        ctx.fillText("Slot " + element.id, element.x, element.y);
+                        ctx.strokeStyle = originalStroke;
+                        ctx.fillStyle = originalFill;
+                    } else {
+                        var elementImage = gameElementImages[element.subtype];
+                        var scaleBy = 200;
+                        var oHeight = elementImage.height;
+                        var oWidth = elementImage.width;
+                        var imageRatio = oHeight / oWidth;
+                        ctx.drawImage(elementImage, element.x - oWidth, element.y - oHeight, scaleBy, scaleBy * imageRatio);
+                    }
+                    
                 }
             }
         });
+        
+        network.addEdgeMode();
+    }
+    
+    function addElementToSlot(slotId, gateType) {
+        for(var i=0; i<currentLevel.length; i++) {
+            var element = currentLevel[i];
+            for (var key in element) {
+                if (element.hasOwnProperty(key) && key === 'id' && element[key] === slotId) {
+                    element.subtype = gateType;
+                }
+            }
+        }
+        resetLevel();
     }
     
     function loadAssets() {
@@ -467,13 +545,84 @@ var visGate = visGate || {};
         callback();
     }
 
-    function init(cId, levelData) {
+    function init(cId, sId, levelData, truthTable, callback) {
         canvasId = cId;
+        slotId = sId;
         loadAssets();
-        waitUntilAssetsLoaded((function(){loadLevel(levelData)}));
+        waitUntilAssetsLoaded((function(){loadLevel(levelData, truthTable); callback()}));
+    }
+    
+    function testLevelFully() {
+        var result = [];
+        for (var i = 0; i < currentLevelTruthTable.length; i++) {
+            //resetNodeGameData();
+            var currentLevelResult = [];
+            var currentTestObjects = currentLevelTruthTable[i];
+            
+            // Find all sources
+            for (var j = 0; j < currentTestObjects.length; j++) {
+                var nodeListWithGameId = nodes.get().filter(function (node) {
+                    return (node.gameElementId === currentTestObjects[j]['id'] && node.gateNodeEndpoint === true && node.gateNodeType === 'output');
+                });
+                if (nodeListWithGameId.length === 0) {
+                    continue;
+                }
+                var localNode = nodeListWithGameId[0];
+                localNode.signal = currentTestObjects[j]['signal'];
+                localNode.activeSignal = true;
+                nodes.update(localNode);
+                
+                currentLevelResult.push({
+                    'gameElementId': currentTestObjects[j]['id'],
+                    'nodeId': localNode.id,
+                    'signal': currentTestObjects[j]['signal'],
+                    'type': 'output',
+                    'result': true,
+                });
+            }
+            
+            // Check result
+            console.log("Check result");
+            checkResult();
+            
+            // Check all displays
+            for (var j = 0; j < currentTestObjects.length; j++) {
+                var nodeListWithGameId = nodes.get().filter(function (node) {
+                    return (node.gameElementId === currentTestObjects[j]['id'] && node.gateNodeEndpoint === true && node.gateNodeType === 'input');
+                });
+                if (nodeListWithGameId.length === 0) {
+                    continue;
+                }
+                var localNode = nodeListWithGameId[0];
+                var localNodeSignal = localNode.signal;
+
+/*
+                console.log("TEST CASE");
+                console.log(localNode);
+                console.log(localNodeSignal);
+                console.log(currentTestObjects[j]['signal']);
+                console.log((localNodeSignal === currentTestObjects[j]['signal']));
+                console.log("TEST CASE END");
+*/
+
+                currentLevelResult.push({
+                    'gameElementId': currentTestObjects[j]['id'],
+                    'nodeId': localNode.id,
+                    'signal': currentTestObjects[j]['signal'],
+                    'type': 'input',
+                    'result': (localNodeSignal === currentTestObjects[j]['signal']),
+                });
+            }
+            result.push(currentLevelResult);
+        }
+        console.log(result);
+        resetNodeGameData();
     }
     
     module.init = init;
     module.checkResult = checkResult;
     module.loadLevel = loadLevel;
+    module.resetLevel = resetLevel;
+    module.addElementToSlot = addElementToSlot;
+    module.testLevelFully = testLevelFully;
 }(visGate));

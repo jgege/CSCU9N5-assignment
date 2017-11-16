@@ -1,28 +1,48 @@
-
 <!doctype html>
 <html>
 <head>
-    <title>LogicGateVis</title>
+    <title>Vizl Gates - Visualise Logic Gates</title>
 
     <script type="text/javascript" src="vendor/vis_4_21_0/dist/vis.js"></script>
     <link href="vendor/vis_4_21_0/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>
-
-    <style type="text/css">
-        #mynetwork {
-            width: 600px;
-            height: 400px;
-            border: 1px solid lightgray;
-        }
-    </style>
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="vendor/materialize/css/materialize.min.css" type="text/css" rel="stylesheet"/>
+    <link href="main.css" type="text/css" rel="stylesheet"/>
 
     <script src="visgate_levels.js"></script>
     <script src="visgate.js"></script>
+    <script src="vendor/jquery/jquery-2.1.1.min.js"></script>
+    <script src="vendor/materialize/js/materialize.js"></script>
 </head>
 <body>
 
+    <button id="vislgateCheckResult" class="waves-effect waves-light btn"><i class="material-icons left">announcement</i>Check result</button>
+    <button id="vislgateDelete" class="waves-effect waves-light btn red disabled"><i class="material-icons left">delete_forever</i>Delete connection</button>
+    
     <div id="mynetwork"></div>
+    <div id="slots"></div>
+
     <script type="text/javascript">
-        visGate.init("mynetwork", visGateLevels[0]);
+        visGate.init('mynetwork', 'slots', visGateLevels['lvl1']['level'], visGateLevels['lvl1']['truthTable'], (function(){
+            visGate.network.on("selectEdge", function() {
+                $('#vislgateDelete').removeClass('disabled');
+            });
+            visGate.network.on("deselectEdge", function() {
+                $('#vislgateDelete').addClass('disabled');
+            });
+            
+            $('#vislgateCheckResult').on('click', function(){
+                $('#vislgateDelete').addClass('disabled');
+                visGate.checkResult();
+            });
+
+            $('#vislgateDelete').on('click', function(){
+                visGate.network.deleteSelected();
+                $('#vislgateDelete').addClass('disabled');
+            });
+        }));
+        
     </script>
 </body>
 </html>
