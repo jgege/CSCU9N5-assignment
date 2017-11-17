@@ -25,3 +25,59 @@
     height: 400px;
     border: 1px solid lightgray;
 }
+
+#vislgate_field {
+    width: 600px;
+    height: 400px;
+    position: absolute;
+}
+
+#vislgateDelete {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+}
+
+#vislgateHelp {
+    position: absolute;
+    left: 20px;
+    top: 20px;    
+}
+
+#slots {
+    overflow-y: scroll;
+    width: 194px;
+    height: 315px;
+    margin-bottom: 10px;
+}
+
+.gameElementSlotGate {
+    margin: 5px;
+    padding: 5px;
+    width: 165px;
+    height: 120px;
+    border: 3px solid grey; 
+}
+
+.gameElementSlotSource {
+    margin: 5px;
+    padding: 5px;
+    width: 165px;
+    height: 75px;
+    border: 3px solid grey; 
+}
+
+#controllerWrapper {
+    position: absolute;
+    right: 0;
+}
+
+#vislgate_wrapper {
+    position: relative;
+    width: 800px;
+    height: 400px;
+}
+
+#controllerWrapper .btn {
+    width: 100%;
+}

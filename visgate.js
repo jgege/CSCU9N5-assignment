@@ -14,10 +14,12 @@ var visGate = visGate || {};
     var options = {
         interaction: {
             hover:true,
-            dragNodes: true,
-            dragView: false
+            dragNodes: false,
+            dragView: false,
+            zoomView: false
         },
         manipulation: {
+            dragView: false,
             enabled: false,
             initiallyActive: true,
             deleteNode: false,
@@ -433,7 +435,8 @@ var visGate = visGate || {};
             
         }
         nodes.update(updatedNodes);
-        network.selectNodes(nodeIdList, false); // hack to redraw node labels
+        // hack to redraw node labels
+        network.selectNodes(nodeIdList, false); 
         network.unselectAll();
     }
 
@@ -623,6 +626,7 @@ var visGate = visGate || {};
     module.checkResult = checkResult;
     module.loadLevel = loadLevel;
     module.resetLevel = resetLevel;
+    module.resetNodeGameData = resetNodeGameData;
     module.addElementToSlot = addElementToSlot;
     module.testLevelFully = testLevelFully;
 }(visGate));

@@ -17,12 +17,71 @@
 </head>
 <body>
 
-    <button id="vislgateCheckResult" class="waves-effect waves-light btn"><i class="material-icons left">announcement</i>Check result</button>
-    <button id="vislgateDelete" class="waves-effect waves-light btn red disabled"><i class="material-icons left">delete_forever</i>Delete connection</button>
+    <div id="vislgate_wrapper">
+        <div id="vislgate_field">
+            <div id="mynetwork"></div>
+            <a id="vislgateHelp" class="btn-floating btn-large waves-effect waves-light light-blue"><i class="material-icons">help_outline</i></a><br>
+            <a id="vislgateDelete" class="btn-floating btn-large waves-effect waves-light red disabled"><i class="material-icons">delete_forever</i></a><br>
+        </div>
+        <div id="controllerWrapper">
+            <div id="slots">
+                <div class="gameElementSlotSource">
+                    <div>Slot - A</div>
+                    <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" />
+                    <label for="filled-in-box">Signal</label>
+                </div>
+                
+                <div class="gameElementSlotSource">
+                    <div>Slot - B</div>
+                    <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" />
+                    <label for="filled-in-box">Signal</label>
+                </div>
+                
+                <div class="gameElementSlotGate">
+                    <div>Slot - 1</div>
+                    <label>Gate type</label>
+                    <select class="browser-default">
+                        <option value="empty" selected>empty</option>
+                        <option value="and">and</option>
+                        <option value="or">or</option>
+                        <option value="xor">xor</option>
+                        <option value="nand">nand</option>
+                        <option value="nor">nor</option>
+                    </select>
+                </div>
+                
+                <div class="gameElementSlotGate">
+                    <div>Slot - 2</div>
+                    <label>Gate type</label>
+                    <select class="browser-default">
+                        <option value="empty" selected>empty</option>
+                        <option value="and">and</option>
+                        <option value="or">or</option>
+                        <option value="xor">xor</option>
+                        <option value="nand">nand</option>
+                        <option value="nor">nor</option>
+                    </select>
+                </div>
+                
+                <div class="gameElementSlotGate">
+                    <div>Slot - 3</div>
+                    <label>Gate type</label>
+                    <select class="browser-default">
+                        <option value="empty" selected>empty</option>
+                        <option value="and">and</option>
+                        <option value="or">or</option>
+                        <option value="xor">xor</option>
+                        <option value="nand">nand</option>
+                        <option value="nor">nor</option>
+                    </select>
+                </div>
+            </div>
+            <button id="vislgateCheckResult" class="waves-effect waves-light btn light-green tooltipped" data-position="left" data-delay="250" data-tooltip="Run current scenario"><i class="material-icons left">done</i>Run</button>
+            <br>
+            <button id="vislgateFullTest" class="waves-effect waves-light btn green tooltipped" data-position="left" data-delay="250" data-tooltip="Test against truth table"><i class="material-icons left">done_all</i>Run tests</button>
+        </div>
+    </div>
     
-    <div id="mynetwork"></div>
-    <div id="slots"></div>
-
     <script type="text/javascript">
         visGate.init('mynetwork', 'slots', visGateLevels['lvl1']['level'], visGateLevels['lvl1']['truthTable'], (function(){
             visGate.network.on("selectEdge", function() {
@@ -40,9 +99,17 @@
             $('#vislgateDelete').on('click', function(){
                 visGate.network.deleteSelected();
                 $('#vislgateDelete').addClass('disabled');
+                visGate.resetNodeGameData();
+            });
+            
+            visGate.network.on("hoverNode", function (params) {
+                visGate.network.canvas.body.container.style.cursor = 'pointer'
+            });
+
+            visGate.network.on("blurNode", function (params) {
+                visGate.network.canvas.body.container.style.cursor = 'default'
             });
         }));
-        
     </script>
 </body>
 </html>
