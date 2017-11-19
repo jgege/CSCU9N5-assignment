@@ -1,5 +1,6 @@
 var visGate = visGate || {};
 (function(module) {
+    var $;
     var canvasId = '';
     var slotId = '';
     var currentLevel = [];
@@ -19,7 +20,6 @@ var visGate = visGate || {};
             zoomView: false
         },
         manipulation: {
-            dragView: false,
             enabled: false,
             initiallyActive: true,
             deleteNode: false,
@@ -93,6 +93,7 @@ var visGate = visGate || {};
     
     function checkResult()
     {
+        resetNodeGameData();
         var allSourceNodes = nodes.get().filter(function (node) {
             return (node.gateNodeType === 'output' && node.activeSignal === true);
         });
@@ -101,8 +102,6 @@ var visGate = visGate || {};
     }
 
     function checkStepForward(localNodeList, step) {
-        console.log(step);
-        console.log(localNodeList);
         var nextStepNodes = [];
         var nextStepNodeIdList = [];
         var movedForward = false;
@@ -201,10 +200,6 @@ var visGate = visGate || {};
                 nextStepNodes.push(node);
             }
         }
-        /*
-        console.log(nextStepNodes);
-        console.log(movedForward);
-        */
         if (nextStepNodes.length === 0 || movedForward === false) {
             return false;
         }
@@ -441,6 +436,8 @@ var visGate = visGate || {};
     }
 
     function initLevel(gameElements) {
+        initSlots(gameElements);
+        
         var nodesAndEdges = createNodesAndEdgesFromGameElements(gameElements);
         nodes = new vis.DataSet(nodesAndEdges['nodes']);
         edges = new vis.DataSet(nodesAndEdges['edges']);
@@ -452,7 +449,6 @@ var visGate = visGate || {};
             edges: edges
         };
         
-        //console.log("Network is being initialised.");
         network = new vis.Network(container, data, options);
         module.network = network;
 
@@ -475,7 +471,7 @@ var visGate = visGate || {};
                         ctx.strokeRect(x, y, width, height);
                         ctx.textAlign = "center";
                         ctx.textBaseline="middle"; 
-                        ctx.fillText("Slot " + element.id, element.x, element.y);
+                        ctx.fillText(element['slotName'], element.x, element.y);
                         ctx.strokeStyle = originalStroke;
                         ctx.fillStyle = originalFill;
                     } else {
@@ -486,7 +482,6 @@ var visGate = visGate || {};
                         var imageRatio = oHeight / oWidth;
                         ctx.drawImage(elementImage, element.x - oWidth, element.y - oHeight, scaleBy, scaleBy * imageRatio);
                     }
-                    
                 }
             }
         });
@@ -505,6 +500,17 @@ var visGate = visGate || {};
         }
         resetLevel();
     }
+    
+    function changeSourceSignal(gameElementId, signal) {
+        var node = nodes.get().filter(function (node) {
+            return (node.gameElementId === gameElementId && node.gateNodeType === 'output');
+        });
+        
+        node[0].signal = signal;
+        node[0].label = (signal) ? "1" : "0";
+        nodes.update(node);
+    }
+    
     
     function loadAssets() {
         var gameElementSpriteFolder = 'images/game_elements/';
@@ -548,14 +554,16 @@ var visGate = visGate || {};
         callback();
     }
 
-    function init(cId, sId, levelData, truthTable, callback) {
+    function init(jQuery, cId, sId, levelData, truthTable, callback) {
         canvasId = cId;
         slotId = sId;
+        $ = jQuery;
         loadAssets();
         waitUntilAssetsLoaded((function(){loadLevel(levelData, truthTable); callback()}));
     }
     
     function testLevelFully() {
+        //resetNodeGameData();
         var result = [];
         for (var i = 0; i < currentLevelTruthTable.length; i++) {
             //resetNodeGameData();
@@ -585,7 +593,6 @@ var visGate = visGate || {};
             }
             
             // Check result
-            console.log("Check result");
             checkResult();
             
             // Check all displays
@@ -598,15 +605,6 @@ var visGate = visGate || {};
                 }
                 var localNode = nodeListWithGameId[0];
                 var localNodeSignal = localNode.signal;
-
-/*
-                console.log("TEST CASE");
-                console.log(localNode);
-                console.log(localNodeSignal);
-                console.log(currentTestObjects[j]['signal']);
-                console.log((localNodeSignal === currentTestObjects[j]['signal']));
-                console.log("TEST CASE END");
-*/
 
                 currentLevelResult.push({
                     'gameElementId': currentTestObjects[j]['id'],
@@ -622,11 +620,52 @@ var visGate = visGate || {};
         resetNodeGameData();
     }
     
+    function initSlots(gameElements) {
+        var $slots = $('#' + slotId);
+        $slots.empty();
+        for (var i = 0; i < gameElements.length; i++) {
+            var content = '';
+            var element = gameElements[i];
+            if (typeof element['slotName'] === "undefined" || element['type'] === 'display') {
+                continue;
+            }
+            if (element.type === 'source') {
+                content  = '<div class="gameElementSlotSource">\
+                    <div>' + element.slotName + '</div>\
+                        <div class="switch">\
+                            <label>0<input type="checkbox" class="gameElement" data-gameEId="' + element.id + '"'+((element.signal)?" checked":"")+'><span class="lever"></span>1</label>\
+                        </div>\
+                    </div>';
+            } else if (element.type === 'gate') {
+                content = '<div class="gameElementSlotGate">\
+                    <div>' + element.slotName + '</div>\
+                    <label>Gate type</label>\
+                    <select class="browser-default gameElement" data-gameEId="' + element.id + '">\
+                        <option value="empty"' + ((element.subtype === 'empty') ? ' selected' : '') + '>empty</option>\
+                        <option value="and"' + ((element.subtype === 'and') ? ' selected' : '') + '>and</option>\
+                        <option value="or"' + ((element.subtype === 'or') ? ' selected' : '') + '>or</option>\
+                        <option value="xor"' + ((element.subtype === 'xor') ? ' selected' : '') + '>xor</option>\
+                        <option value="nand"' + ((element.subtype === 'nand') ? ' selected' : '') + '>nand</option>\
+                        <option value="nor"' + ((element.subtype === 'nor') ? ' selected' : '') + '>nor</option>\
+                        <option value="not"' + ((element.subtype === 'not') ? ' selected' : '') + '>not</option>\
+                    </select>\
+                </div>';
+            }
+            
+            if (content.length > 0) {
+                $slots.append(content);
+            } else {
+                console.log("Unable to initialise slot.");
+            }
+        }
+    }
+    
     module.init = init;
     module.checkResult = checkResult;
     module.loadLevel = loadLevel;
     module.resetLevel = resetLevel;
     module.resetNodeGameData = resetNodeGameData;
     module.addElementToSlot = addElementToSlot;
+    module.changeSourceSignal = changeSourceSignal;
     module.testLevelFully = testLevelFully;
 }(visGate));

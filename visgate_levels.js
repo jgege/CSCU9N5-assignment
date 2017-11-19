@@ -1,12 +1,11 @@
 var visGateLevels = {
     lvl1:{ // Level 1
         level: [
-            {id: 1, type: 'source', x: 0, y: 50, signal: true},
-            {id: 2, type: 'source', x: 0, y: 150, signal: true},
+            {id: 1, type: 'source', x: 0, y: 50, signal: true, slotName: 'Slot - A'},
+            {id: 2, type: 'source', x: 0, y: 150, signal: true, slotName: 'Slot - B'},
             {id: 3, type: 'gate', subtype: 'and', x: 150, y: 100},
             {id: 4, type: 'display', x: 550, y: 100},
-            {id: 5, type: 'gate', subtype: 'not', x: 350, y: 100},
-            {id: 6, type: 'gate', subtype: 'empty', x: 350, y: 200},
+            {id: 5, type: 'gate', subtype: 'empty', x: 350, y: 100, slotName: 'Slot - 1'},
         ],
         truthTable:[
             [
