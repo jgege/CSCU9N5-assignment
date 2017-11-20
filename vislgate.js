@@ -1,10 +1,14 @@
-var visGate = visGate || {};
+var vislGate = vislGate || {};
 (function(module) {
+    var getCurrentLevelIndex = 0;
     var $;
     var canvasId = '';
+    var initCallback;
+    var truthTable;
     var slotId = '';
     var currentLevel = [];
     var currentLevelTruthTable = [];
+    var levelData;
     var gameElementImages = {};
     var numberOfGameElementSprite = 0;
     var numberOfGameElementSpriteLoaded = 0;
@@ -17,12 +21,16 @@ var visGate = visGate || {};
             hover:true,
             dragNodes: false,
             dragView: false,
-            zoomView: false
+            zoomView: true
         },
         manipulation: {
             enabled: false,
             initiallyActive: true,
-            deleteNode: false,
+            deleteNode: function(data, callback) {
+                data = data['edges'];
+                callback(data);
+                network.addEdgeMode();
+            },
             addNode: false,
             addEdge: function(edgeData,callback) {
                 var fromNode;
@@ -132,22 +140,22 @@ var visGate = visGate || {};
                         // Both input signals are active
                         if ((gateType === 'not')? (inputB.activeSignal === true) : (inputA.activeSignal === true && inputB.activeSignal === true)) {
                             if (gateType === 'and') {
-                                nextNode.signal = (inputA.signal && inputB.signal);
+                                nextNode.signal = ((inputA.signal && inputB.signal))?1:0;
                                 movedForward = true;
                             } else if(gateType === 'nand') {
-                                nextNode.signal = !(inputA.signal && inputB.signal);
+                                nextNode.signal = (!(inputA.signal && inputB.signal))?1:0;
                                 movedForward = true;
                             } else if(gateType === 'or') {
-                                nextNode.signal = (inputA.signal || inputB.signal);
+                                nextNode.signal = ((inputA.signal || inputB.signal))?1:0;
                                 movedForward = true;
                             } else if(gateType === 'nor') {
-                                nextNode.signal = !(inputA.signal || inputB.signal);
+                                nextNode.signal = (!(inputA.signal || inputB.signal))?1:0;
                                 movedForward = true;
                             } else if(gateType === 'not') {
-                                nextNode.signal = !(inputB.signal);
+                                nextNode.signal = (!(inputB.signal))?1:0;
                                 movedForward = true;
                             } else if(gateType === 'xor') {
-                                nextNode.signal = ((inputA.signal || inputB.signal) && !(inputA.signal && inputB.signal));
+                                nextNode.signal = (((inputA.signal || inputB.signal) && !(inputA.signal && inputB.signal)))?1:0;
                                 movedForward = true;
                             } else {
                                 console.log("Unknown gate type.");
@@ -487,6 +495,7 @@ var visGate = visGate || {};
         });
         
         network.addEdgeMode();
+        initCallback(truthTable);
     }
     
     function addElementToSlot(slotId, gateType) {
@@ -554,12 +563,14 @@ var visGate = visGate || {};
         callback();
     }
 
-    function init(jQuery, cId, sId, levelData, truthTable, callback) {
+    function init(jQuery, cId, sId, lLevelData, levelInitcallback, firstInitCallback) {
         canvasId = cId;
         slotId = sId;
         $ = jQuery;
+        initCallback = levelInitcallback;
+        levelData = lLevelData;
         loadAssets();
-        waitUntilAssetsLoaded((function(){loadLevel(levelData, truthTable); callback()}));
+        waitUntilAssetsLoaded((function(){loadLevel(lLevelData['level'], lLevelData['truthTable']); firstInitCallback();}));
     }
     
     function testLevelFully() {
@@ -609,15 +620,15 @@ var visGate = visGate || {};
                 currentLevelResult.push({
                     'gameElementId': currentTestObjects[j]['id'],
                     'nodeId': localNode.id,
-                    'signal': currentTestObjects[j]['signal'],
+                    'signal': localNodeSignal,
                     'type': 'input',
                     'result': (localNodeSignal === currentTestObjects[j]['signal']),
                 });
             }
             result.push(currentLevelResult);
         }
-        console.log(result);
         resetNodeGameData();
+        return result;
     }
     
     function initSlots(gameElements) {
@@ -660,6 +671,110 @@ var visGate = visGate || {};
         }
     }
     
+    function renderGameStart() {
+        var title = levelData['levelTitle'];
+        var description = levelData['levelDescription'];
+        var level = currentLevel;
+        var truthTable = currentLevelTruthTable;
+        var content = '<h4>' + title + '</h4>\
+                <p>' + description + '</p>';
+        var slotNameByGameId = {};
+        for (var i = 0; i < level.length; i++) {
+            if (level[i].type === 'source' || level[i].type === 'display') {
+                slotNameByGameId[level[i].id] = level[i].slotName;
+            }
+        }
+
+        var tableExpected = '';
+        var tableResult = '';
+
+        tableExpected = '<table class="striped centered responsive-table"><thead><tr><th colspan="'+(truthTable[0].length)+'">Expected</th></tr><tr>';
+        for (var i = 0; i < truthTable[0].length; i++) {
+            tableExpected += '<th>' + slotNameByGameId[truthTable[0][i]['id']] + '</th>';
+        }
+        tableExpected += '</tr></thead>';
+        tableExpected += '<tbody>';
+        for (var i = 0; i < truthTable.length; i++) {
+            var truthTableTestCase = truthTable[i];
+            tableExpected += '<tr>';
+            for (var j = 0; j < truthTableTestCase.length; j++) {
+                tableExpected += '<td>' + truthTableTestCase[j].signal + '</td>';
+            }
+            tableExpected += '</tr>';
+        }
+        tableExpected += '</tbody></table>';
+
+        return content + tableExpected;
+    }
+    
+    function renderGameTest() {
+        var title = levelData['levelTitle'];
+        var description = levelData['levelDescription'];
+        var level = currentLevel;
+        var truthTable = currentLevelTruthTable;
+        var content = '<h4>' + title + '</h4>\
+                <p>' + description + '</p>';
+        var slotNameByGameId = {};
+        for (var i = 0; i < level.length; i++) {
+            if (level[i].type === 'source' || level[i].type === 'display') {
+                slotNameByGameId[level[i].id] = level[i].slotName;
+            }
+        }
+
+        var tableExpected = '';
+        tableExpected = '<table class="striped centered responsive-table"><thead><tr><th colspan="'+(truthTable[0].length)+'">Expected</th></tr><tr>';
+        for (var i = 0; i < truthTable[0].length; i++) {
+            tableExpected += '<th>' + slotNameByGameId[truthTable[0][i]['id']] + '</th>';
+        }
+        tableExpected += '</tr></thead>';
+        tableExpected += '<tbody>';
+        for (var i = 0; i < truthTable.length; i++) {
+            var truthTableTestCase = truthTable[i];
+            tableExpected += '<tr>';
+            for (var j = 0; j < truthTableTestCase.length; j++) {
+                tableExpected += '<td>' + ((truthTableTestCase[j].signal)? "1" : "0") + '</td>';
+            }
+            tableExpected += '</tr>';
+        }
+        tableExpected += '</tbody></table>';
+        
+        var testResult = testLevelFully();
+        var tableResult = '';
+        var testSuccessful = true;
+        tableResult= '<table class="striped centered responsive-table"><thead><tr><th colspan="'+(testResult[0].length)+'">Result</th></tr><tr>';
+        for (var i = 0; i < testResult[0].length; i++) {
+            tableResult+= '<th>' + slotNameByGameId[testResult[0][i]['gameElementId']] + '</th>';
+        }
+        tableResult+= '</tr></thead>';
+        tableResult+= '<tbody>';
+        for (var i = 0; i < testResult.length; i++) {
+            var testResultTestCase = testResult[i];
+            tableResult+= '<tr>';
+            for (var j = 0; j < testResultTestCase.length; j++) {
+                tableResult+= '<td>' + ((testResultTestCase[j].signal) ? "1" : "0") + '</td>';
+                if (testResultTestCase[j].result === false) {
+                    testSuccessful = false;
+                }
+            }
+            tableResult+= '</tr>';
+        }
+        tableResult+= '</tbody></table>';
+        console.log(testResult);
+        
+        if (testSuccessful === true) {
+            $('#vislGateNextLevel').removeClass('disabled');
+        }
+
+        return content + '<div class="row"><div class="col s6">' + tableExpected + '</div><div class="col s6">' + tableResult + '</div></div>';
+    }
+    
+    function nextLevel(level, callback) {
+        loadLevel(level['level'], level['truthTable']);
+        levelData = level;
+        getCurrentLevelIndex++;
+        callback();
+    }
+    
     module.init = init;
     module.checkResult = checkResult;
     module.loadLevel = loadLevel;
@@ -668,4 +783,10 @@ var visGate = visGate || {};
     module.addElementToSlot = addElementToSlot;
     module.changeSourceSignal = changeSourceSignal;
     module.testLevelFully = testLevelFully;
-}(visGate));
+    module.renderGameStart = renderGameStart;
+    module.renderGameTest = renderGameTest;
+    module.nextLevel = nextLevel;
+    module.getCurrentLevelIndex = function() {
+        return getCurrentLevelIndex;
+    };
+}(vislGate));

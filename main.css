@@ -1,5 +1,5 @@
 .one-screen-height {
-    height: 80vh;
+    min-height: 80vh;
 }
 .videoWrapper {
         position: relative;
@@ -76,6 +76,8 @@
     position: relative;
     width: 800px;
     height: 400px;
+    margin: 0 auto;
+    display: none;
 }
 
 #controllerWrapper .btn {

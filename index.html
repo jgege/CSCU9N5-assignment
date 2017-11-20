@@ -3,51 +3,163 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-        <title>Vizl Gates - Visualise Logic Gates</title>
+        <title>VislGates - Visualised Logic Gates</title>
 
         <!-- CSS  -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
         <link href="vendor/materialize/css/materialize.min.css" type="text/css" rel="stylesheet"/>
         <link href="main.css" type="text/css" rel="stylesheet"/>
+        <link href="vendor/vis_4_21_0/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>        
+
+        
+        <script type="text/javascript" src="vendor/vis_4_21_0/dist/vis.js"></script>
+        <script src="vislgate_levels.js"></script>
+        <script src="vislgate.js"></script>
+        <script src="vendor/jquery/jquery-2.1.1.min.js"></script>
+        <script src="vendor/materialize/js/materialize.js"></script>
     </head>
     <body>
+        <div>
+            <nav class="blue accent-4" role="navigation">
+                <div class="nav-wrapper container">
+                    <a id="logo-container" href="#" class="brand-logo">VislGates</a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="#menu-play">Play</a></li>
+                        <li><a href="#menu-game-elements">Gate types</a></li>
+                        <li><a href="#menu-learning-material">Learning materials</a></li>
+                    </ul>
 
-        <nav class="orange accent-4" role="navigation">
-            <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">LogicGateWizard</a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="#">Play</a></li>
-                    <li><a href="#">Gate types</a></li>
-                    <li><a href="#">Learning materials</a></li>
-                    <li><a href="#">Walkthroughs</a></li>
-                </ul>
-
-                <ul id="nav-mobile" class="side-nav">
-                    <li><a href="#">Play</a></li>
-                    <li><a href="#">Gate types</a></li>
-                    <li><a href="#">Learning materials</a></li>
-                    <li><a href="#">Walkthroughs</a></li>
-                </ul>
-                <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-            </div>
-        </nav>
-
-        <div class="section no-pad-bot one-screen-height yellow lighten-3" id="index-banner">
-            <div class="container">
-                <h1 class="header center orange-text">Logic gates</h1>
-                <div class="row center">
-                    <h5 class="header col s12 light">A game to help you learn more about logic gates</h5>
+                    <ul id="nav-mobile" class="side-nav">
+                        <li><a href="#menu-play">Play</a></li>
+                        <li><a href="#menu-game-elements">Gate types</a></li>
+                        <li><a href="#menu-learning-material">Learning materials</a></li>
+                    </ul>
+                    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
                 </div>
-                <div class="row center">
-                    <a class="waves-effect waves-light btn-large orange modal-trigger" href="#modal1">Play</a>
+            </nav>
+        </div>
+
+        <div class="section one-screen-height white" id="index-banner">
+            <div class="container">
+                <h1 id="menu-play" class="header center blue-text">VislGates</h1>
+                <div class="row center">                    
+                    <div class="hide-on-large-only">
+                        <p>The game can only be played on desktop but you can still reading and watch everything on the site.</p>
+                    </div>
+                    <div class="hide-on-med-and-down">
+                        <div class="row center">
+                            <h5 class="header col s12 light">A game to help you learn more about logic gates</h5>
+                        </div>
+                        <button id="playBtn" class="waves-effect waves-light btn-large blue modal-trigger">Play</button>
+                        <div id="vislgate_wrapper">
+                            <div id="vislgate_field">
+                                <div id="mynetwork"></div>
+                                <a id="vislgateHelp" class="btn-floating btn waves-effect waves-light light-blue"><i class="material-icons">help_outline</i></a><br>
+                                <a id="vislgateDelete" class="btn-floating btn waves-effect waves-light red disabled"><i class="material-icons">delete_forever</i></a><br>
+                            </div>
+                            <div id="controllerWrapper">
+                                <div id="slots"></div>
+                                <button id="vislgateCheckResult" class="waves-effect waves-light btn light-green tooltipped" data-position="left" data-delay="250" data-tooltip="Run current scenario"><i class="material-icons left">done</i>Run</button>
+                                <br>
+                                <button id="vislgateFullTest" class="waves-effect waves-light btn green tooltipped" data-position="left" data-delay="250" data-tooltip="Test against truth table"><i class="material-icons left">done_all</i>Run tests</button>
+                            </div>
+                        </div>
+
+                        <script type="text/javascript">
+                            $('#playBtn').on('click', function() {
+                                $('#vislgate_wrapper').show(); 
+                                $(this).hide();
+                                
+                               vislGate.init($, 'mynetwork', 'slots', vislGateLevels[vislGateLevelOrder[0]], (function(truthTable){
+                                    vislGate.network.on("selectEdge", function() {
+                                        $('#vislgateDelete').removeClass('disabled');
+                                    });
+                                    vislGate.network.on("deselectEdge", function() {
+                                        $('#vislgateDelete').addClass('disabled');
+                                    });
+
+                                    vislGate.network.on("hoverNode", function (params) {
+                                        vislGate.network.canvas.body.container.style.cursor = 'pointer'
+                                    });
+
+                                    vislGate.network.on("blurNode", function (params) {
+                                        vislGate.network.canvas.body.container.style.cursor = 'default'
+                                    });
+                                }), (function() {
+                                    $(document).ready(function() {
+                                        $('#vislGameModalContent').html(vislGate.renderGameStart());
+
+                                        $('#vislgateCheckResult').on('click', function(){
+                                            Materialize.toast('Test done. You can check your nodes\' value.', 2000);
+                                            $('#vislgateDelete').addClass('disabled');
+                                            vislGate.checkResult();
+                                        });
+                                        $('#vislgateFullTest').on('click', function(){
+                                            $('#vislgateDelete').addClass('disabled');
+                                            $('#vislGameModalContent').html(vislGate.renderGameTest());
+                                            $('#modal1').modal('open');
+                                        });
+
+                                        $('#vislgateHelp').on('click', function() {
+                                            $('#vislGameModalContent').html(vislGate.renderGameStart());
+                                            $('#modal1').modal('open'); 
+                                        });
+
+                                        $('#vislgateDelete').on('click', function(){
+                                            vislGate.network.deleteSelected();
+                                            $('#vislgateDelete').addClass('disabled');
+                                            vislGate.resetNodeGameData();
+                                        });
+                                        
+                                        $('#modal1').modal('open');
+                                    });
+                                }));
+
+                                $(document).on("change", '.gameElement', function(event) {
+                                    var $this = $(this);
+                                    var value = $this.val();
+                                    var gameId = $this.data('gameeid');
+
+                                    if (value === 'on' || value === 'off') { // switch so it's a source
+                                        value = $this.prop('checked');
+                                        vislGate.changeSourceSignal(gameId, value);
+                                        vislGate.resetNodeGameData();
+                                    } else { // dropdown so it's a gate
+                                        var $toastContent = $('<span>Slot changed</span>').add($('<button class="btn-flat toast-action-undo white-text">Undo</button>'));
+                                        Materialize.toast($toastContent, 10000);
+                                        vislGate.addElementToSlot(gameId, value);
+                                    }
+                                });
+                                
+                                $(document).on('click', '#vislGateNextLevel', function() {
+                                    var $this = $(this);
+                                    if (vislGate.getCurrentLevelIndex()+1 >= vislGateLevelOrder.length) {
+                                        Materialize.toast('No more levels implemented in the prototype.', 10000);
+                                        return;
+                                    }
+                                    
+                                    vislGate.nextLevel(vislGateLevels[vislGateLevelOrder[vislGate.getCurrentLevelIndex()+1]], function() {});
+                                    $this.addClass('disabled');
+                                    $('#modal1').modal('close');
+                                    $('#vislGameModalContent').html(vislGate.renderGameStart());
+                                    setTimeout(function() { $('#modal1').modal('open'); $('#modal1').scrollTop(0);}, 500);
+                                    $('#modal1').scrollTop = 0;
+                                });
+                                
+                                $(document).on("click", '.toast-action-undo', function() {
+                                    alert('Undo action is not implemented in the prototype :(');
+                                });
+                            });
+                        </script>
+                    </div>
                 </div>
             </div>
         </div>
 
-
-        <div class="red accent-4">
+        <div class="light-green accent-4">
             <div class="container">
                 <div class="section">
-                    <h2 class="header center white-text">Game elements</h2>
+                    <h2 id="menu-game-elements" class="header center white-text">Gate types</h2>
                     <div class="row">
                         <div class="col l4 m6">
                             <div class="card medium">
@@ -324,36 +436,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col l4 m6">
-                            <div class="card medium">
-                                <div class="card-image">
-                                    <img src="images/gates/source.png">
-                                </div>
-                                <div class="card-content">
-                                    <span class="card-title grey-text text-darken-4">Input</span>
-                                    <p>Input</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col l4 m6">
-                            <div class="card medium">
-                                <div class="card-image">
-                                    <img src="images/gates/endpoint.png">
-                                </div>
-                                <div class="card-content">
-                                    <span class="card-title grey-text text-darken-4">Output</span>
-                                    <p>Output</p>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="blue darken-3">
+        <div class="amber darken-2">
             <div class="container">
                 <div class="section">
-                    <h2 class="header center white-text">Learning material</h2>
+                    <h2 id="menu-learning-material" class="header center white-text">Learning material</h2>
                     <div class="row">
                         <div class="col s12">
                             <div class="card horizontal">
@@ -391,7 +482,7 @@
             </div>
         </div>
 
-        <footer class="page-footer blue">
+        <footer class="page-footer orange">
             <div class="footer-copyright">
                 <div class="container">
                     Created by Student id: 2423955
@@ -402,7 +493,10 @@
         <!-- Modal Structure -->
         <div id="modal1" class="modal">
             <div class="modal-content">
-                <p>Hello World</p>
+                <div id="vislGameModalContent"></div>
+                
+                <button class="waves-effect waves-light btn blue modal-close">Close</button>
+                <button id="vislGateNextLevel" class="waves-effect waves-light btn green disabled tooltipped" data-position="right" data-delay="250" data-tooltip="Continue to the next level">Next level</button>
                 <button class="modal-close btn-flat modal-close-btn">X</button>
             </div>
         </div>
@@ -426,11 +520,10 @@
 
 
         <!--  Scripts-->
-        <script src="vendor/jquery/jquery-2.1.1.min.js"></script>
-        <script src="vendor/materialize/js/materialize.js"></script>
         <script>
             $(document).ready(function(){
                 $('.modal').modal({dismissible: false});
+                $(".button-collapse").sideNav();
             });
         </script>
     </body>
